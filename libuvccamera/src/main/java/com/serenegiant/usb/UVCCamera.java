@@ -42,7 +42,7 @@ import com.serenegiant.usb.USBMonitor.UsbControlBlock;
 public class UVCCamera {
 	private static final boolean DEBUG = false;	// TODO set false when releasing
 	private static final String TAG = UVCCamera.class.getSimpleName();
-	private static final String DEFAULT_USBFS = "/dev/bus/usb";
+	private static final String DEFAULT_USBFS = "/dev/bus/usb/001/";
 
 	public static final int DEFAULT_PREVIEW_WIDTH = 640;
 	public static final int DEFAULT_PREVIEW_HEIGHT = 480;
