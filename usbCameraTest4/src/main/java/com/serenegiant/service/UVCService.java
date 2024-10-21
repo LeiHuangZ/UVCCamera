@@ -24,12 +24,15 @@
 package com.serenegiant.service;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.hardware.usb.UsbDevice;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Surface;
@@ -120,19 +123,40 @@ public class UVCService extends BaseService {
 	private void showNotification(final CharSequence text) {
 		if (DEBUG) Log.v(TAG, "showNotification:" + text);
         // Set the info for the views that show in the notification panel.
-        final Notification notification = new Notification.Builder(this)
-			.setSmallIcon(R.drawable.ic_launcher)  // the status icon
-			.setTicker(text)  // the status text
-			.setWhen(System.currentTimeMillis())  // the time stamp
-			.setContentTitle(getText(R.string.app_name))  // the label of the entry
-			.setContentText(text)  // the contents of the entry
-			.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0))  // The intent to send when the entry is clicked
-			.build();
+        final Notification notification = createNotification(text);
 
 		startForeground(NOTIFICATION, notification);
         // Send the notification.
 		mNotificationManager.notify(NOTIFICATION, notification);
     }
+
+	// 在你的服务的 onStartCommand() 方法中
+	private static final int NOTIFICATION_ID = 1;
+
+	// 创建一个有效的通知
+	private Notification createNotification(final CharSequence text) {
+		String channelId = "my_channel_id";
+		String channelName = "My Channel Name";
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_DEFAULT);
+			NotificationManager notificationManager = getSystemService(NotificationManager.class);
+			notificationManager.createNotificationChannel(channel);
+		}
+
+		Intent intent = new Intent(this, MainActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+
+		NotificationCompat.Builder builder = new NotificationCompat.Builder(this, channelId)
+				.setSmallIcon(R.drawable.ic_launcher)  // the status icon
+				.setTicker(text)  // the status text
+				.setWhen(System.currentTimeMillis())  // the time stamp
+				.setContentTitle(getText(R.string.app_name))  // the label of the entry
+				.setContentText(text)  // the contents of the entry
+				.setContentIntent(PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0));  // The intent to send when the entry is clicked
+
+		return builder.build();
+	}
 
 	private final OnDeviceConnectListener mOnDeviceConnectListener = new OnDeviceConnectListener() {
 		@Override

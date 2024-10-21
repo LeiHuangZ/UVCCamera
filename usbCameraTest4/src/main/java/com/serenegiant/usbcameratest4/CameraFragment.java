@@ -171,7 +171,7 @@ public class CameraFragment extends BaseFragment {
 		@Override
 		public void onAttach(final UsbDevice device) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onAttach:");
-			if (!updateCameraDialog() && (mCameraView.hasSurface())) {
+			if (!updateCameraDialog() && (mCameraView.hasSurface()) && mPreviewButton.isEnabled()) {
 				tryOpenUVCCamera(true);
 			}
 		}
